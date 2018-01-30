@@ -1,12 +1,12 @@
 <template>
   <div id="app">
-    <v-header></v-header>
+    <v-header :seller="seller"></v-header>
     <div class="tab border-1px">
       <div class="tab-item">
         <router-link to="/goods">商品</router-link>
       </div>
       <div class="tab-item">
-        <router-link to="/ratings">评价</router-link>
+        <router-link to="/ratings">评论</router-link>
       </div>
       <div class="tab-item">
         <router-link to="/seller">商家</router-link>
@@ -20,7 +20,28 @@
 
 <script>
 import header from '@/components/header/header'
+
+const STATUS_OK = 0
 export default {
+  data() {
+    return {
+      seller: {}
+    }
+  },
+  created() {
+    this.$http
+      .get('/api/seller')
+      .then(response => {
+        let data = response.data
+        if (data.errno === STATUS_OK) {
+          this.seller = data.data
+        }
+        console.log(this.seller)
+      })
+      .catch(error => {
+        console.log(error)
+      })
+  },
   components: {
     'v-header': header
   }
@@ -28,7 +49,7 @@ export default {
 </script>
 
 <style lang="stylus">
-@import "./common/stylus/mixin.styl"
+@import './common/stylus/mixin.styl'
 #app
   .tab
     display flex
