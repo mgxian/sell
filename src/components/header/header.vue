@@ -23,8 +23,10 @@
       </div>
     </div>
     <div class="bulletin-wrapper">
-      <span class="title"></span><!--
-      --><span class="text">{{seller.bulletin}}</span>
+      <span class="title"></span>
+      <!--
+      -->
+      <span class="text">{{seller.bulletin}}</span>
       <i class="icon-keyboard_arrow_right"></i>
     </div>
     <div class="background">
@@ -53,7 +55,9 @@
             <div class="text">商家公告</div>
             <div class="line"></div>
           </div>
-          <div class="bulletin">{{seller.bulletin}}</div>
+          <div class="bulletin">
+            <p class="content">{{seller.bulletin}}</p>
+          </div>
         </div>
       </div>
       <div class="detail-close" @click="showDetail">
@@ -212,8 +216,8 @@ export default {
     width 100%
     height 100%
     overflow auto
-    backdrop-filter: blur(10px)
-    opacity: 1
+    backdrop-filter blur(10px)
+    opacity 1
     background rgba(7, 17, 27, 0.8)
     .detail-wrapper
       min-height 100%
@@ -278,9 +282,10 @@ export default {
         .bulletin
           width 80%
           margin 0 auto
-          padding 0 12px
-          font-size 12px
-          line-height 24px
+          .content
+            padding 0 12px
+            font-size 12px
+            line-height 24px
     .detail-close
       position relative
       width 32px
