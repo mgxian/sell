@@ -1,6 +1,6 @@
 <template>
   <div class="goods">
-    <div class="menu">
+    <div class="menu" ref="menuWrapper">
       <ul>
         <li v-for="(memuItem,index) in goods" :key="index" class="menu-item">
           <span class="text border-1px">
@@ -9,7 +9,7 @@
         </li>
       </ul>
     </div>
-    <div class="foods-wrapper">
+    <div class="foods-wrapper" ref="foodWrapper">
       <ul>
         <li v-for="(item,index) in goods" :key="index" class="food-list">
           <h1 class="title">{{item.name}}</h1>
@@ -39,12 +39,17 @@
 </template>
 
 <script>
+import BScroll from 'better-scroll'
 const STATUS_OK = 0
 export default {
   data() {
     return {
       goods: []
     }
+  },
+  mounted() {
+    this.menuScroll = new BScroll(this.$refs.menuWrapper)
+    this.foodScroll = new BScroll(this.$refs.foodWrapper)
   },
   created() {
     this.supports_map = [
@@ -74,16 +79,26 @@ export default {
 @import '../../common/stylus/mixin'
 .goods
   display flex
+  position absolute
+  top 174px
+  bottom 46px
+  width 100%
+  overflow hidden
   .menu
-    overflow hidden
     flex 0 0 80px
-    background-color #f3f5f7
+    background #f3f5f7
     .menu-item
       display table
       width 56px
       height 54px
       padding 0 12px
       line-height 14px
+      &.current
+        margin-top -1px
+        background #fff
+        .text
+          font-weight 700
+          border-none()
       .text
         display table-cell
         vertical-align middle
