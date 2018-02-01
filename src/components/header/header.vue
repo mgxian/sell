@@ -23,10 +23,7 @@
       </div>
     </div>
     <div class="bulletin-wrapper">
-      <span class="title"></span>
-      <!--
-      -->
-      <span class="text">{{seller.bulletin}}</span>
+      <span class="title"></span><span class="text">{{seller.bulletin}}</span>
       <i class="icon-keyboard_arrow_right"></i>
     </div>
     <div class="background">
