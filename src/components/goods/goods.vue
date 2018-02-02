@@ -35,11 +35,13 @@
         </li>
       </ul>
     </div>
+    <shopcart></shopcart>
   </div>
 </template>
 
 <script>
 import BScroll from 'better-scroll'
+import shopcart from '@/components/shopcart/shopcart'
 const STATUS_OK = 0
 export default {
   data() {
@@ -50,6 +52,9 @@ export default {
     }
   },
   mounted() {},
+  components: {
+    shopcart
+  },
   methods: {
     selectMenu(index, event) {
       if (!event._constructed) {
