@@ -2,16 +2,16 @@
   <div class="goods">
     <div class="menu" ref="menuWrapper">
       <ul>
-        <li v-for="(memuItem,index) in goods" :key="index" class="menu-item">
+        <li v-for="(memuItem,index) in goods" :key="index" class="menu-item" :class="{'current':currentIndex===index}" @click="selectMenu(index,$event)" ref="menuList">
           <span class="text border-1px">
-            <span v-if="memuItem.type>0" class="icon" :class="supports_map[memuItem.type]"></span>{{memuItem.name}}
+            <span v-show="memuItem.type>0" class="icon" :class="supports_map[memuItem.type]"></span>{{memuItem.name}}
           </span>
         </li>
       </ul>
     </div>
     <div class="foods-wrapper" ref="foodWrapper">
       <ul>
-        <li v-for="(item,index) in goods" :key="index" class="food-list">
+        <li v-for="(item,index) in goods" :key="index" class="food-list" ref="foodList">
           <h1 class="title">{{item.name}}</h1>
           <ul>
             <li v-for="(food, index) in item.foods" :key="index" class="food-item border-1px">
@@ -44,12 +44,73 @@ const STATUS_OK = 0
 export default {
   data() {
     return {
-      goods: []
+      goods: [],
+      listHeight: [],
+      scrollY: 0
     }
   },
-  mounted() {
-    this.menuScroll = new BScroll(this.$refs.menuWrapper)
-    this.foodScroll = new BScroll(this.$refs.foodWrapper)
+  mounted() {},
+  methods: {
+    selectMenu(index, event) {
+      if (!event._constructed) {
+        return
+      }
+      let foodList = this.$refs.foodList
+      let el = foodList[index]
+      this.foodsScroll.scrollToElement(el, 300)
+      this._calculateHeight()
+    },
+    _calculateHeight() {
+      let foodList = this.$refs.foodList
+      let height = 0
+      this.listHeight.push(height)
+      for (let i = 0; i < foodList.length; i++) {
+        let item = foodList[i]
+        height += item.clientHeight
+        this.listHeight.push(height)
+      }
+    },
+    _followScroll(index) {
+      let menuList = this.$refs.menuList
+      let el = menuList[index]
+      this.menuScroll.scrollToElement(el, 300, 0, -100)
+    },
+    _initScroll() {
+      if (!this.meunScroll) {
+        console.log('init meunScroll')
+        this.menuScroll = new BScroll(this.$refs.menuWrapper, {
+          click: true
+        })
+      }
+
+      if (!this.foodsScroll) {
+        console.log('init foodsScroll')
+        this.foodsScroll = new BScroll(this.$refs.foodWrapper, {
+          click: true,
+          probeType: 3
+        })
+
+        this.foodsScroll.on('scroll', pos => {
+          // 判断滑动方向，避免下拉时分类高亮错误（如第一分类商品数量为1时，下拉使得第二分类高亮）
+          if (pos.y <= 0) {
+            this.scrollY = Math.abs(Math.round(pos.y))
+          }
+        })
+      }
+    }
+  },
+  computed: {
+    currentIndex() {
+      for (let i = 0; i < this.listHeight.length; i++) {
+        let height1 = this.listHeight[i]
+        let height2 = this.listHeight[i + 1]
+        if (!height2 || (this.scrollY >= height1 && this.scrollY < height2)) {
+          this._followScroll(i)
+          return i
+        }
+      }
+      return 0
+    }
   },
   created() {
     this.supports_map = [
@@ -65,8 +126,11 @@ export default {
         let data = response.data
         if (data.errno === STATUS_OK) {
           this.goods = data.data
+          this.$nextTick(() => {
+            this._initScroll()
+            this._calculateHeight()
+          })
         }
-        console.log(this.goods)
       })
       .catch(error => {
         console.log(error)

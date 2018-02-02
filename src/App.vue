@@ -36,7 +36,7 @@ export default {
         if (data.errno === STATUS_OK) {
           this.seller = data.data
         }
-        console.log(this.seller)
+        // console.log(this.seller)
       })
       .catch(error => {
         console.log(error)

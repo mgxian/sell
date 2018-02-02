@@ -29,7 +29,7 @@ export default {
       let onCount = Math.floor(score / 2)
       let offFlag = score / 2 - onCount
       let itemClasses = []
-      console.log(onCount, offFlag)
+      // console.log(onCount, offFlag)
       for (let i = 0; i < onCount; i++) {
         itemClasses.push(CLS_ON)
       }
