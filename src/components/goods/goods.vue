@@ -29,19 +29,24 @@
                   <span class="now">￥{{food.price}}</span>
                   <span class="old" v-show="food.oldPrice">￥{{food.oldPrice}}</span>
                 </div>
+                <div class="cartcontrol-wrapper">
+                  <cartcontrol :food="food" @add="addFood"></cartcontrol>
+                </div>
               </div>
             </li>
           </ul>
         </li>
       </ul>
     </div>
-    <shopcart></shopcart>
+    <shopcart :deliveryPrice="seller.deliveryPrice" :minPrice="seller.minPrice" ref="shopcart"></shopcart>
   </div>
 </template>
 
 <script>
 import BScroll from 'better-scroll'
 import shopcart from '@/components/shopcart/shopcart'
+import cartcontrol from '@/components/cartcontrol/cartcontrol'
+
 const STATUS_OK = 0
 export default {
   data() {
@@ -51,11 +56,23 @@ export default {
       scrollY: 0
     }
   },
+  props: {
+    seller: {
+      type: Object,
+      default() {
+        return {}
+      }
+    }
+  },
   mounted() {},
   components: {
-    shopcart
+    shopcart,
+    cartcontrol
   },
   methods: {
+    addFood(target) {
+      this._drop(target)
+    },
     selectMenu(index, event) {
       if (!event._constructed) {
         return
@@ -82,14 +99,14 @@ export default {
     },
     _initScroll() {
       if (!this.meunScroll) {
-        console.log('init meunScroll')
+        // console.log('init meunScroll')
         this.menuScroll = new BScroll(this.$refs.menuWrapper, {
           click: true
         })
       }
 
       if (!this.foodsScroll) {
-        console.log('init foodsScroll')
+        // console.log('init foodsScroll')
         this.foodsScroll = new BScroll(this.$refs.foodWrapper, {
           click: true,
           probeType: 3
@@ -102,6 +119,12 @@ export default {
           }
         })
       }
+    },
+    _drop(target) {
+      // 体验优化,异步执行下落动画
+      this.$nextTick(() => {
+        this.$refs.shopcart.drop(target)
+      })
     }
   },
   computed: {
@@ -245,4 +268,8 @@ export default {
             text-decoration line-through
             margin-left 8px
             font-size 10px
+        .cartcontrol-wrapper
+          position absolute
+          right 0
+          bottom 12px
 </style>
