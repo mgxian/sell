@@ -1,33 +1,61 @@
 <template>
-  <div class="shopcart">
-    <div class="content">
-      <div class="content-left">
-        <div class="logo-wrapper">
-          <div class="logo" :class="{'highlight':totalPrice}">
-            <span class="icon-shopping_cart" :class="{'highlight':totalPrice}"></span>
+  <div>
+    <div class="shopcart">
+      <div class="content" @click="toggleList">
+        <div class="content-left">
+          <div class="logo-wrapper">
+            <div class="logo" :class="{'highlight':totalPrice}">
+              <span class="icon-shopping_cart" :class="{'highlight':totalPrice}"></span>
+            </div>
+            <div class="num">{{totalCount}}</div>
           </div>
-          <div class="num">{{totalCount}}</div>
+          <div class="price" :class="{'highlight':totalPrice}">￥{{totalPrice}}</div>
+          <div class="desc">{{descText}}</div>
         </div>
-        <div class="price" :class="{'highlight':totalPrice}">￥{{totalPrice}}</div>
-        <div class="desc">{{descText}}</div>
+        <div class="content-right">
+          <div class="pay" :class="{'payClass':payFlag}">{{payText}}</div>
+        </div>
       </div>
-      <div class="content-right">
-        <div class="pay" :class="{'payClass':payFlag}">{{payText}}</div>
+      <div class="ball-container">
+        <div v-for="(ball,index) in balls" :key="index">
+          <transition name="drop" @before-enter="beforeDrop" @enter="dropping" @after-enter="afterDrop">
+            <div v-show="ball.show" class="ball">
+              <div class="inner inner-hook"></div>
+            </div>
+          </transition>
+        </div>
       </div>
-    </div>
-    <div class="ball-container">
-      <div v-for="(ball,index) in balls" :key="index">
-        <transition name="drop" @before-enter="beforeDrop" @enter="dropping" @after-enter="afterDrop">
-          <div v-show="ball.show" class="ball">
-            <div class="inner inner-hook"></div>
+      <transition name="fold">
+        <div class="shopcart-list" v-show="listShow">
+          <div class="list-header">
+            <h1 class="title">购物车</h1>
+            <span class="empty" @click="empty">清空</span>
           </div>
-        </transition>
-      </div>
+          <div class="list-content" ref="foodList">
+            <ul>
+              <li class="food" v-for="(food,index) in selectFoods" :key="index">
+                <span class="name">{{food.name}}</span>
+                <div class="price">
+                  <span>￥{{food.price*food.count}}</span>
+                </div>
+                <div class="cartcontrol-wrapper">
+                  <cartcontrol :food="food"></cartcontrol>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </transition>
     </div>
+    <transition name="fade">
+      <div class="list-mask" @click="hideList" v-show="listShow"></div>
+    </transition>
   </div>
 </template>
 
 <script>
+import cartcontrol from '@/components/cartcontrol/cartcontrol'
+import BScroll from 'better-scroll'
 export default {
   data() {
     return {
@@ -48,7 +76,8 @@ export default {
           show: false
         }
       ],
-      dropBalls: []
+      dropBalls: [],
+      fold: true
     }
   },
   props: {
@@ -72,7 +101,26 @@ export default {
       }
     }
   },
+  components: {
+    cartcontrol
+  },
   methods: {
+    toggleList() {
+      if (!this.totalCount) {
+        return
+      }
+      this.fold = !this.fold
+      // console.log(this.fold)
+    },
+    empty() {
+      this.selectFoods.forEach(food => {
+        food.count = 0
+      })
+      this.fold = true
+    },
+    hideList() {
+      this.fold = true
+    },
     drop(el) {
       for (let i = 0; i < this.balls.length; i++) {
         let ball = this.balls[i]
@@ -80,7 +128,7 @@ export default {
           ball.show = true
           ball.el = el
           this.dropBalls.push(ball)
-          console.log('push')
+          // console.log('push')
           return
         }
       }
@@ -101,7 +149,7 @@ export default {
           inner.style.transform = `translate3d(${x}px,0,0)`
         }
       }
-      console.log('beforeDrop')
+      // console.log('beforeDrop')
     },
     dropping(el, done) {
       /* eslint-disable no-unused-vars */
@@ -114,7 +162,7 @@ export default {
         inner.style.transform = 'translate3d(0,0,0)'
         el.addEventListener('transitionend', done)
       })
-      console.log('dropping')
+      // console.log('dropping')
     },
     afterDrop(el) {
       let ball = this.dropBalls.shift()
@@ -122,7 +170,16 @@ export default {
         ball.show = false
         el.style.display = 'none'
       }
-      console.log('afterDrop')
+      // console.log('afterDrop')
+    },
+    _initScroll() {
+      if (!this.listScroll) {
+        this.listScroll = new BScroll(this.$refs.foodList, {
+          click: true
+        })
+      } else {
+        this.listScroll.refresh()
+      }
     }
   },
   computed: {
@@ -156,12 +213,25 @@ export default {
         total += food.price * food.count
       })
       return total
+    },
+    listShow() {
+      if (!this.totalCount) {
+        return false
+      }
+      let show = !this.fold
+      if (show) {
+        this.$nextTick(() => {
+          this._initScroll()
+        })
+      }
+      return show
     }
   }
 }
 </script>
 
 <style lang="stylus">
+@import '../../common/stylus/mixin'
 .shopcart
   position fixed
   height 48px
@@ -173,6 +243,7 @@ export default {
   .content
     display flex
     font-size 0
+    background #141d27
     .content-left
       flex 1
       .logo-wrapper
@@ -253,7 +324,7 @@ export default {
       position fixed
       left 32px
       bottom 22px
-      z-index 500
+      z-index 200
       transition all 0.4s cubic-bezier(0.49, -0.29, 0.75, 0.41)
       .inner
         width 16px
@@ -261,4 +332,74 @@ export default {
         border-radius 50%
         background rgb(0, 160, 220)
         transition all 0.4s linear
+  .shopcart-list
+    position absolute
+    left 0
+    top 0
+    width 100%
+    z-index -1
+    transform translate3d(0, -100%, 0)
+    &.fold-enter-active, &.fold-leave-active
+      transition all 0.5s
+    &.fold-enter, &.fold-leave-to
+      transform translate3d(0, 0, 0)
+    .list-header
+      background #f3f5f7
+      padding 0 18px
+      height 40px
+      color rgb(7, 17, 27)
+      line-height 40px
+      border-bottom 1px solid rgba(7, 17, 27, 0.1)
+      .title
+        float left
+        font-size 14px
+      .empty
+        float right
+        font-size 12px
+        color rgb(0, 160, 220)
+    .list-content
+      background #fff
+      padding 0 18px
+      max-height 217px
+      overflow hidden
+      .food
+        padding 12px 0
+        box-sizing border-box
+        border-1px(rgba(7, 17, 27, 0.1))
+        &:last-child
+          border-none()
+        .name
+          display inline-block
+          font-size 14px
+          line-height 24px
+          color rgb(7, 17, 27)
+        .price
+          position absolute
+          right 90px
+          bottom 12px
+          font-size 14px
+          font-weight 700
+          line-height 24px
+          color red
+          > span
+            font-weight 700
+        .cartcontrol-wrapper
+          position absolute
+          right 0
+          bottom 6px
+.list-mask
+  position fixed
+  top 0
+  left 0
+  width 100%
+  height 100%
+  z-index 40
+  backdrop-filter blur(10px)
+  opacity 1
+  background rgba(7, 17, 27, 0.6)
+  &.fade-enter-active, &.fade-leave-active
+    transition all 0.5s
+  &.fade-enter, &.fade-leave-to
+    opacity 0
+    background rgba(7, 17, 27, 0)
 </style>
