@@ -1,14 +1,14 @@
 <template>
   <div class="ratingselect">
     <div class="rating-type border-1px">
-      <span @click="select(2,$event)" class="all" :class="{'active':selectType===2}">{{desc.all}}
-        <span class="count">{{ratings.length}}</span>
+      <span @click="select(2,$event)" class="all" :class="{'active':selectType===2}">
+        {{desc.all}}<span class="count">{{ratings.length}}</span>
       </span>
-      <span @click="select(0,$event)" class="positive" :class="{'active':selectType===0}">{{desc.positive}}
-        <span class="count">{{positives.length}}</span>
+      <span @click="select(0,$event)" class="positive" :class="{'active':selectType===0}">
+        {{desc.positive}}<span class="count">{{positives.length}}</span>
       </span>
-      <span @click="select(1,$event)" class="negative" :class="{'active':selectType===1}">{{desc.negative}}
-        <span class="count">{{negatives.length}}</span>
+      <span @click="select(1,$event)" class="negative" :class="{'active':selectType===1}">
+        {{desc.negative}}<span class="count">{{negatives.length}}</span>
       </span>
     </div>
     <div @click="toggleContent($event)" class="switch" :class="{'on':onlyContent}">
@@ -97,7 +97,7 @@ export default {
       &:last-child
         margin-right 0
       .count
-        // margin-left 2px
+        margin-left 2px
         font-size 8px
     .all
       background rgba(0, 160, 220, 0.2)
