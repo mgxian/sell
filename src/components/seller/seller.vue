@@ -9,6 +9,10 @@
             <span class="num">（{{seller.ratingCount}}）</span>
             <span class="count">月售{{seller.sellCount}}单</span>
           </div>
+          <div class="collect" @click="collect($event)">
+            <i class="icon-favorite" :class="{'active':collectFlag}"></i>
+            <p class="text">{{collectText}}</p>
+          </div>
         </div>
         <div class="summary">
           <div class="min-price">
@@ -54,11 +58,6 @@
           <div class="pics" ref="picList">
             <img class="pic" width="120" height="90" v-for="(pic,index) in seller.pics" :key="index" :src="pic">
           </div>
-          <!-- <ul class="pic-list" ref="picList">
-            <li class="pic-item" v-for="(pic,index) in seller.pics" :key="index">
-              <img :src="pic" width="120" height="90">
-            </li>
-          </ul> -->
         </div>
       </div>
       <split></split>
@@ -81,13 +80,22 @@ import BScroll from 'better-scroll'
 export default {
   data() {
     return {
+      collectFlag: false,
       supports_map: ['decrease', 'discount', 'special', 'invoice', 'guarantee']
     }
   },
   methods: {
+    collect() {
+      if (!event._constructed) {
+        return
+      }
+      this.collectFlag = !this.collectFlag
+    },
     _initScroll() {
       if (!this.allScroll) {
-        this.allScroll = new BScroll(this.$refs.seller)
+        this.allScroll = new BScroll(this.$refs.seller, {
+          click: true
+        })
       } else {
         this.allScroll.refresh()
       }
@@ -116,6 +124,15 @@ export default {
   props: {
     seller: {
       type: Object
+    }
+  },
+  computed: {
+    collectText() {
+      if (this.collectFlag) {
+        return '已收藏'
+      } else {
+        return '收藏'
+      }
     }
   },
   components: {
@@ -177,6 +194,23 @@ export default {
           font-size 10px
           line-height 18px
           color rgb(77, 85, 93)
+      .collect
+        position absolute
+        right 18px
+        top 18px
+        width 50px
+        text-align center
+        .icon-favorite
+          font-size 24px
+          line-height 24px
+          color #d4d6d9
+          &.active
+            color rgb(240, 20, 20)
+        .text
+          margin-top 4px
+          font-size 10px
+          line-height 10px
+          color rgb(77, 85, 93)
     .summary
       display flex
       padding 18px 0
@@ -208,13 +242,15 @@ export default {
         flex 1
   .bulletin-wrapper
     padding 18px
+    padding-bottom 0
     .title
       font-size 14px
       // font-weight 700
       line-height 14px
       color rgb(7, 17, 27)
     .desc-wrapper
-      padding 16px 12px
+      margin-top 8px
+      padding 0 12px 16px 12px
       border-1px(rgba(7, 17, 27, 0.1))
       .desc
         font-size 12px
@@ -226,7 +262,6 @@ export default {
       font-size 0
       &:last-child
         border-none()
-        padding-bottom 0
       border-1px(rgba(7, 17, 27, 0.1))
       .icon
         display inline-block
@@ -236,15 +271,15 @@ export default {
         background-size 16px 16px
         background-repeat no-repeat
         &.decrease
-          bg-image('decrease_2')
+          bg-image('decrease_4')
         &.discount
-          bg-image('discount_2')
+          bg-image('discount_4')
         &.guarantee
-          bg-image('guarantee_2')
+          bg-image('guarantee_4')
         &.invoice
-          bg-image('invoice_2')
+          bg-image('invoice_4')
         &.special
-          bg-image('special_2')
+          bg-image('special_4')
       .desc
         display inline-block
         margin-left 6px
@@ -253,7 +288,7 @@ export default {
         line-height 16px
         color rgb(7, 17, 27)
   .senery
-    padding 18px 0 18px 18px
+    padding 18px
     .title
       font-size 14px
       line-height 14px
@@ -273,7 +308,7 @@ export default {
           &:last-child
             margin-right 0
   .infos
-    padding 16px
+    padding 18px
     padding-bottom 0
     .title
       padding-bottom 12px
