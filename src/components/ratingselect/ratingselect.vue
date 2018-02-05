@@ -126,7 +126,7 @@ export default {
       font-size 24px
     .text
       display inline-block
+      vertical-align top
       margin-left 4px
       font-size 12px
-      height 24px
 </style>
