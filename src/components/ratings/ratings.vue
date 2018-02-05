@@ -25,11 +25,11 @@
         </div>
       </div>
       <split></split>
-      <div class="rating">
+      <div class="rating border-1px">
         <ratingselect @select="selectRating" @toggle="toggleContent" :ratings="ratings" :selectType="selectType" :onlyContent="onlyContent" :desc="desc"></ratingselect>
         <div class="detail">
           <ul>
-            <li v-show="needShow(rating.rateType,rating.text)" v-for="(rating,index) in ratings" :key="index" class="rating">
+            <li v-show="needShow(rating.rateType,rating.text)" v-for="(rating,index) in ratings" :key="index" class="rating border-1px">
               <img class="avatar" width="28" height="28" :src="rating.avatar">
               <div class="content">
                 <div class="user">
